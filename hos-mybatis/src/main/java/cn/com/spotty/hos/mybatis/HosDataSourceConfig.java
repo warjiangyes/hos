@@ -20,7 +20,7 @@ import java.util.Set;
 @Configuration
 @MapperScan(basePackages = HosDataSourceConfig.PACKAGE, sqlSessionFactoryRef = "HosSqlSessionFactory")
 public class HosDataSourceConfig {
-    static final String PACKAGE = "cn.com.spotty.hos.mapper";
+    static final String PACKAGE = "cn.com.spotty.hos.**";
 
     @Bean(name = "HosDataSource")
     @Primary
