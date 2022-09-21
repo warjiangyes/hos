@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Import(HosDataSourceConfig.class)
 @PropertySource("classpath:application.properties")
-@ComponentScan("cn.com.spotty.hos.*")
-@MapperScan("cn.com.spotty.hos.*")
+@ComponentScan("cn.com.spotty.hos.**")
+@MapperScan("cn.com.spotty.hos.**")
 public class BaseTest {
 }

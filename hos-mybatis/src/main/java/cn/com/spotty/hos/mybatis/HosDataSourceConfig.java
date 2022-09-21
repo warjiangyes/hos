@@ -48,8 +48,7 @@ public class HosDataSourceConfig {
 
     @Bean(name = "HosSqlSessionFactory")
     @Primary
-    public SqlSessionFactory hosSqlSessionFactory(
-            @Qualifier("HosDataSource") DataSource hosDataSource) throws Exception {
+    public SqlSessionFactory hosSqlSessionFactory(@Qualifier("HosDataSource") DataSource hosDataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(hosDataSource);
 
