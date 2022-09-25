@@ -33,6 +33,10 @@ public class HosConfiguration {
     private HosConfiguration() {
     }
 
+    public static HosConfiguration getConfiguration() {
+        return configuration;
+    }
+
     public String getString(String key) {
         return properties.getProperty(key);
     }

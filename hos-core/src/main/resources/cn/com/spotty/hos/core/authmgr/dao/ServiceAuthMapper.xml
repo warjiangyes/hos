@@ -9,10 +9,16 @@
         <result column="AUTH_TIME" property="authTime"/>
     </resultMap>
     <insert id="addAuth">
-        insert into SERVICE_AUTH
-            (BUCKET_NAME,TARGET_TOKEN,AUTH_TIME)
-        values
-            (#{auth.bucketName},#{auth.targetToken},#{auth.authTime})
+        <choose>
+            <when test="auth.authTime != null">
+                INSERT INTO SERVICE_AUTH (BUCKET_NAME, TARGET_TOKEN, AUTH_TIME)
+                VALUES (#{auth.bucketName},#{auth.targetToken},#{auth.authTime})
+            </when>
+            <otherwise>
+                INSERT INTO SERVICE_AUTH (BUCKET_NAME, TARGET_TOKEN)
+                VALUES (#{auth.bucketName},#{auth.targetToken})
+            </otherwise>
+        </choose>
     </insert>
 
     <delete id="deleteAuth">

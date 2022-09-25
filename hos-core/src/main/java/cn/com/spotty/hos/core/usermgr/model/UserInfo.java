@@ -14,12 +14,14 @@ public class UserInfo {
     private SystemRole systemRole;
     private Date createTime;
 
-    public UserInfo(String userName, String password, String detail, SystemRole systemRole) {
+    public UserInfo(String userName, String password, SystemRole systemRole, String detail) {
         this.userId = CoreUtil.getUUID();
         this.userName = userName;
         this.password = CoreUtil.getMd5Password(password);
         this.detail = detail;
         this.systemRole = systemRole;
         this.createTime = new Date();
+    }
+    public UserInfo() {
     }
 }
