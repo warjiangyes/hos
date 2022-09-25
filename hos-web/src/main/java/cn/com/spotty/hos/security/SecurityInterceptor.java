@@ -64,7 +64,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
             userInfoCache.put(tokenInfo.getToken(), userInfo);
         }
         ContextUtil.setCurrentUser(userInfo);
-        return false;
+        return true;
     }
 
     @Override

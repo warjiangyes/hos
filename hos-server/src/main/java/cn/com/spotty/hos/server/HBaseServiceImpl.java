@@ -23,12 +23,21 @@ public class HBaseServiceImpl {
                 columnDescriptor.setMaxVersions(1);
                 tableDescriptor.addFamily(columnDescriptor);
             }
-            admin.createTable(tableDescriptor, splitKeys);
+            if (splitKeys != null) {
+                admin.createTable(tableDescriptor, splitKeys);
+            } else {
+                admin.createTable(tableDescriptor);
+            }
+
         } catch (Exception ex) {
             String msg = String.format("create table=%s error. msg=%s", tableName, ex.getMessage());
             throw new HosServerException(ErrorCodes.ERROR_HBASE, msg);
         }
         return true;
+    }
+
+    public static boolean createTable(Connection connection, String tableName, String[] cfs) {
+        return createTable(connection, tableName, cfs, null);
     }
 
     // 2. 删除表
@@ -91,11 +100,13 @@ public class HBaseServiceImpl {
         Get get = new Get(rowKey.getBytes());
         return getRow(connection, tableName, get);
     }
+
     public static Result getRow(Connection connection, String tableName, String rowKey, FilterList filterList) {
         Get get = new Get(rowKey.getBytes());
         get.setFilter(filterList);
         return getRow(connection, tableName, get);
     }
+
     public static Result getRow(Connection connection, String tableName, String rowKey, byte[] cf, byte[] qualifier) {
         Get get = new Get(rowKey.getBytes());
         get.addColumn(cf, qualifier);
@@ -118,6 +129,7 @@ public class HBaseServiceImpl {
         scan.setStopRow(stopRowKey);
         return getScanner(connection, tableName, scan);
     }
+
     public static ResultScanner getScanner(Connection connection, String tableName, String startRowKey, String stopRowKey) {
         Scan scan = new Scan();
         scan.setStartRow(startRowKey.getBytes());
@@ -159,6 +171,7 @@ public class HBaseServiceImpl {
         try (Table table = connection.getTable(TableName.valueOf(tableName))) {
             return table.incrementColumnValue(rowKey.getBytes(), cf, qualifier, value);
         } catch (Exception ex) {
+            ex.printStackTrace();
             throw new HosServerException(ErrorCodes.ERROR_HBASE, "incrementColumnValue error");
         }
     }

@@ -68,7 +68,7 @@ public class HosStoreImpl implements IHosStore {
 
     @Override
     public void createSeqTable() throws IOException {
-        HBaseServiceImpl.createTable(connection, HosUtil.BUCKET_DIR_SEQ_TABLE, new String[]{HosUtil.BUCKET_DIR_SEQ_CF}, null);
+        HBaseServiceImpl.createTable(connection, HosUtil.BUCKET_DIR_SEQ_TABLE, new String[]{HosUtil.BUCKET_DIR_SEQ_CF});
     }
 
     @Override
@@ -84,7 +84,7 @@ public class HosStoreImpl implements IHosStore {
             String dir = key.substring(0, key.lastIndexOf("/") + 1);
             String hash = null;
             while (hash == null) {
-                if (dirExist(bucket, dir)) {
+                if (!dirExist(bucket, dir)) {
                     hash = putDir(bucket, dir);
                 } else {
                     hash = getDirSeqId(bucket, dir);
