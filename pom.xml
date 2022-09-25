@@ -5,15 +5,15 @@
     <groupId>cn.com.spotty.hos</groupId>
     <artifactId>hos</artifactId>
     <version>1.0-SNAPSHOT</version>
-  <modules>
-    <module>hos-mybatis</module>
-      <module>hos-core</module>
-      <module>hos-server</module>
-      <module>hos-web</module>
-      <module>hos-sdk</module>
-      <module>hos-common</module>
-  </modules>
-  <packaging>pom</packaging>
+    <modules>
+        <module>hos-mybatis</module>
+        <module>hos-core</module>
+        <module>hos-server</module>
+        <module>hos-web</module>
+        <module>hos-sdk</module>
+        <module>hos-common</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>hos</name>
 

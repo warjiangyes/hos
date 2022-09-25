@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>hos-mabatis</artifactId>
+    <artifactId>hos-mybatis</artifactId>
     <packaging>jar</packaging>
 
     <name>hos-mybatis</name>
