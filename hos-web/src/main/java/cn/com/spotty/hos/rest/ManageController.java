@@ -30,9 +30,9 @@ public class ManageController extends BaseController {
                              @RequestParam("password") String password,
                              @RequestParam(name = "detail", required = false, defaultValue = "") String detail,
                              @RequestParam(name = "role", required = false, defaultValue = "USER") String role) {
+        // 添加用户
         UserInfo currentUser = ContextUtil.getCurrentUser();
-        if (operationAccessControl
-                .checkSystemRole(currentUser.getSystemRole(), SystemRole.valueOf(role))) {
+        if (operationAccessControl.checkSystemRole(currentUser.getSystemRole(), SystemRole.valueOf(role))) {
             UserInfo userInfo = new UserInfo(userName, password, SystemRole.valueOf(role), detail);
             userService.addUser(userInfo);
             return getResult("success");
@@ -42,6 +42,7 @@ public class ManageController extends BaseController {
 
     @RequestMapping(value = "user", method = RequestMethod.DELETE)
     public Object deleteUser(@RequestParam("userId") String userId) {
+        // 删除用户
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (operationAccessControl.checkSystemRole(currentUser.getSystemRole(), userId)) {
             userService.deleteUser(userId);
@@ -54,6 +55,7 @@ public class ManageController extends BaseController {
     public Object updateUserInfo(
             @RequestParam(name = "password", required = false, defaultValue = "") String password,
             @RequestParam(name = "detail", required = false, defaultValue = "") String detail) {
+
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (currentUser.getSystemRole().equals(SystemRole.VISITOR)) {
             return getError(ErrorCodes.ERROR_PERMISSION_DENIED, "PERMISSION DENIED");
@@ -73,6 +75,7 @@ public class ManageController extends BaseController {
     public Object createToken(
             @RequestParam(name = "expireTime", required = false, defaultValue = "7") String expireTime,
             @RequestParam(name = "isActive", required = false, defaultValue = "true") String isActive) {
+        // 添加token
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (!currentUser.getSystemRole().equals(SystemRole.VISITOR)) {
             TokenInfo tokenInfo = new TokenInfo(currentUser.getUserName());
@@ -86,6 +89,7 @@ public class ManageController extends BaseController {
 
     @RequestMapping(value = "token", method = RequestMethod.DELETE)
     public Object deleteToken(@RequestParam("token") String token) {
+        // 删除token
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (operationAccessControl.checkTokenOwner(currentUser.getUserName(), token)) {
             authService.deleteToken(token);
@@ -145,11 +149,10 @@ public class ManageController extends BaseController {
 
     @RequestMapping(value = "auth", method = RequestMethod.POST)
     public Object createAuth(@RequestBody ServiceAuth serviceAuth) {
+        // 授权
         UserInfo currentUser = ContextUtil.getCurrentUser();
-        if (operationAccessControl
-                .checkBucketOwner(currentUser.getUserName(), serviceAuth.getBucketName())
-                && operationAccessControl
-                .checkTokenOwner(currentUser.getUserName(), serviceAuth.getTargetToken())) {
+        if (operationAccessControl.checkBucketOwner(currentUser.getUserName(), serviceAuth.getBucketName())
+                && operationAccessControl.checkTokenOwner(currentUser.getUserName(), serviceAuth.getTargetToken())) {
             authService.addAuth(serviceAuth);
             return getResult("success");
         }
@@ -159,11 +162,10 @@ public class ManageController extends BaseController {
     @RequestMapping(value = "auth", method = RequestMethod.DELETE)
     public Object deleteAuth(@RequestParam("bucket") String bucket,
                              @RequestParam("token") String token) {
+        // 取消授权
         UserInfo currentUser = ContextUtil.getCurrentUser();
-        if (operationAccessControl
-                .checkBucketOwner(currentUser.getUserName(), bucket)
-                && operationAccessControl
-                .checkTokenOwner(currentUser.getUserName(), token)) {
+        if (operationAccessControl.checkBucketOwner(currentUser.getUserName(), bucket)
+                && operationAccessControl.checkTokenOwner(currentUser.getUserName(), token)) {
             authService.deleteAuth(bucket, token);
             return getResult("success");
         }

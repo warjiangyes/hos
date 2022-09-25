@@ -14,4 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ComponentScan("cn.com.spotty.hos.**")
 @MapperScan("cn.com.spotty.hos.**")
 public class BaseTest {
+    public BaseTest() {
+        System.out.println("BaseTest");
+    }
 }

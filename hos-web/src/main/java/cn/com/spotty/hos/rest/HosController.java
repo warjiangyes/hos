@@ -8,6 +8,7 @@ import cn.com.spotty.hos.server.IBucketService;
 import cn.com.spotty.hos.server.IHosStore;
 import com.google.common.base.Splitter;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,8 +43,8 @@ public class HosController extends BaseController {
 
     private static String TMP_DIR = System.getProperty("user.dir") + File.separator + "tmp";
 
-
     public HosController() {
+        // 创建临时目录
         File file = new File(TMP_DIR);
         file.mkdirs();
     }
@@ -51,6 +52,7 @@ public class HosController extends BaseController {
     @RequestMapping(value = "bucket", method = RequestMethod.POST)
     public Object createBucket(@RequestParam("bucket") String bucketName,
                                @RequestParam(name = "detail", required = false, defaultValue = "") String detail) {
+        // 创建bucket
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (!currentUser.getSystemRole().equals(SystemRole.VISITOR)) {
             bucketService.addBucket(currentUser, bucketName, detail);
@@ -67,6 +69,7 @@ public class HosController extends BaseController {
 
     @RequestMapping(value = "bucket", method = RequestMethod.DELETE)
     public Object deleteBucket(@RequestParam("bucket") String bucket) {
+        // 删除bucket
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (operationAccessControl.checkBucketOwner(currentUser.getUserName(), bucket)) {
             try {
@@ -96,10 +99,10 @@ public class HosController extends BaseController {
 
     @RequestMapping(value = "bucket", method = RequestMethod.GET)
     public Object getBucket(@RequestParam(name = "bucket") String bucket) {
+        // 获取bucket列表
         UserInfo currentUser = ContextUtil.getCurrentUser();
         BucketModel bucketModel = bucketService.getBucketByName(bucket);
-        if (operationAccessControl
-                .checkPermission(currentUser.getUserId(), bucketModel.getBucketName())) {
+        if (operationAccessControl.checkPermission(currentUser.getUserId(), bucketModel.getBucketName())) {
             return bucketModel;
         }
         return "PERMISSION DENIED";
@@ -121,6 +124,9 @@ public class HosController extends BaseController {
                             @RequestParam(value = "content", required = false) MultipartFile file,
                             HttpServletRequest request,
                             HttpServletResponse response) throws Exception {
+        // 上传文件(创建目录)
+        // 创建目录or上传文件
+        // 上传文件，如果文件过大，可能会造成内存不足，先缓存到本地
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (!operationAccessControl.checkPermission(currentUser.getUserId(), bucket)) {
             response.setStatus(HttpStatus.SC_FORBIDDEN);
@@ -164,19 +170,17 @@ public class HosController extends BaseController {
                 return "object content could not be empty";
             }
 
-            if (file != null) {
-                if (file.getSize() > MAX_FILE_IN_MEMORY) {
-                    distFile = new File(TMP_DIR + File.separator + UUID.randomUUID().toString());
-                    file.transferTo(distFile);
-                    file.getInputStream().close();
-                    buffer = new FileInputStream(distFile).getChannel()
-                            .map(MapMode.READ_ONLY, 0, file.getSize());
-                } else {
-                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    org.apache.commons.io.IOUtils.copy(file.getInputStream(), outputStream);
-                    buffer = ByteBuffer.wrap(outputStream.toByteArray());
-                    file.getInputStream().close();
-                }
+            if (file.getSize() > MAX_FILE_IN_MEMORY) {
+                distFile = new File(TMP_DIR + File.separator + UUID.randomUUID().toString());
+                file.transferTo(distFile);
+                file.getInputStream().close();
+                buffer = new FileInputStream(distFile).getChannel()
+                        .map(MapMode.READ_ONLY, 0, file.getSize());
+            } else {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                IOUtils.copy(file.getInputStream(), outputStream);
+                buffer = ByteBuffer.wrap(outputStream.toByteArray());
+                file.getInputStream().close();
             }
             hosStoreService.put(bucket, key, buffer, file.getSize(), mediaType, attrs);
             return "success";
@@ -206,8 +210,8 @@ public class HosController extends BaseController {
     public ObjectListResult listObject(@RequestParam("bucket") String bucket,
                                        @RequestParam("startKey") String startKey,
                                        @RequestParam("endKey") String endKey,
-                                       HttpServletResponse response)
-            throws IOException {
+                                       HttpServletResponse response) throws IOException {
+        // 列出目录下的文件(浏览)
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (!operationAccessControl.checkPermission(currentUser.getUserId(), bucket)) {
             response.setStatus(HttpStatus.SC_FORBIDDEN);
@@ -314,6 +318,7 @@ public class HosController extends BaseController {
     @RequestMapping(value = "object", method = RequestMethod.DELETE)
     public Object deleteObject(@RequestParam("bucket") String bucket,
                                @RequestParam("key") String key) throws Exception {
+        // 删除文件
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (!operationAccessControl.checkPermission(currentUser.getUserId(), bucket)) {
             return "PERMISSION DENIED";
@@ -326,6 +331,7 @@ public class HosController extends BaseController {
     public void getObject(@RequestParam("bucket") String bucket,
                           @RequestParam("key") String key, HttpServletRequest request,
                           HttpServletResponse response) throws IOException {
+        // 下载文件
         UserInfo currentUser = ContextUtil.getCurrentUser();
         if (!operationAccessControl.checkPermission(currentUser.getUserId(), bucket)) {
             response.setStatus(HttpStatus.SC_FORBIDDEN);

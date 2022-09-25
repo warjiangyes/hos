@@ -22,8 +22,7 @@ public class LoginController extends BaseController {
 
     @RequestMapping("/loginPost")
     @ResponseBody
-    public Object loginPost(String username, String password, HttpSession session)
-            throws IOException {
+    public Object loginPost(String username, String password, HttpSession session) throws IOException {
         if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password)) {
             return getError(ErrorCodes.ERROR_PERMISSION_DENIED, "username or password can not be null");
         }

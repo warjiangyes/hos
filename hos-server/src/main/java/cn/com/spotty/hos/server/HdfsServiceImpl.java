@@ -9,12 +9,16 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.log4j.Logger;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 
 public class HdfsServiceImpl implements IHdfsService {
     private static Logger logger = Logger.getLogger(HdfsServiceImpl.class);
@@ -23,15 +27,20 @@ public class HdfsServiceImpl implements IHdfsService {
     private long initBlockSize = defaultBlockSize / 2;
 
     public HdfsServiceImpl() throws Exception {
-        // 1. 读取hdfs相关配置信息
-        HosConfiguration hosConfiguration = HosConfiguration.getConfiguration();
-        String confDir = hosConfiguration.getString("hadoop.conf.dir");
-        String hdfsUri = hosConfiguration.getString("hadoop.uri");
-        // 2. 通过配置获取一个fileSystem实例对象
-        Configuration conf = new Configuration();
-        conf.addResource(new Path(confDir + "/core-site.xml"));
-        conf.addResource(new Path(confDir + "/hdfs-site.xml"));
-        fileSystem = FileSystem.get(new URI(hdfsUri), conf);
+        try{
+            // 1. 读取hdfs相关配置信息
+            HosConfiguration hosConfiguration = HosConfiguration.getConfiguration();
+            String confDir = hosConfiguration.getString("hadoop.conf.dir");
+            String hdfsUri = hosConfiguration.getString("hadoop.uri");
+            // 2. 通过配置获取一个fileSystem实例对象
+            DefaultResourceLoader loader = new DefaultResourceLoader();
+            Configuration conf = new Configuration();
+            conf.addResource(new Path(confDir + "/core-site.xml"));
+            conf.addResource(new Path(confDir + "/hdfs-site.xml"));
+            fileSystem = FileSystem.get(new URI(hdfsUri), conf);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -16,8 +16,10 @@ import java.io.IOException;
 
 @Configuration
 public class HosServerBeanConfiguration {
+
     @Bean
     public Connection getConnection() throws IOException {
+        // 获取hbase connection并注入到bean中
         org.apache.hadoop.conf.Configuration config = HBaseConfiguration.create();
         HosConfiguration confUtil = HosConfiguration.getConfiguration();
 
@@ -30,6 +32,7 @@ public class HosServerBeanConfiguration {
 
     @Bean(name = "hosStoreService")
     public IHosStore getHosStore(@Autowired Connection connection) throws Exception {
+        // 实例化一个HosStore实例
         HosConfiguration confUtil = HosConfiguration.getConfiguration();
         String zkHosts = confUtil.getString("hbase.zookeeper.quorum");
         return new HosStoreImpl(connection, new HdfsServiceImpl(), zkHosts);

@@ -3,7 +3,7 @@ package cn.com.spotty.hos.security;
 import cn.com.spotty.hos.core.usermgr.model.UserInfo;
 
 public class ContextUtil {
-    public final static String SESSION_KEY = "user_token";
+    public final static String SESSION_KEY = "USER_TOKEN";
 
     private static ThreadLocal<UserInfo> userInfoThreadLocal = new ThreadLocal<>();
 

@@ -68,11 +68,10 @@ public class DefaultOperationAccessControl implements IOperationAccessControl {
 
     @Override
     public boolean checkPermission(String token, String bucket) {
+        // 检查token是否过期
         if (authService.checkToken(token)) {
             ServiceAuth serviceAuth = authService.getServiceAuth(bucket, token);
-            if (serviceAuth != null) {
-                return true;
-            }
+            return serviceAuth != null;
         }
         return false;
     }

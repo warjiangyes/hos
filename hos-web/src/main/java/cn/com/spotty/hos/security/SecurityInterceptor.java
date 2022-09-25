@@ -32,14 +32,17 @@ public class SecurityInterceptor implements HandlerInterceptor {
     private Cache<String, UserInfo> userInfoCache = CacheBuilder.newBuilder().expireAfterWrite(20, TimeUnit.MINUTES).build();
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 登录页面不做校验
         if (request.getRequestURI().equals("/loginPost")) {
             return true;
         }
         String token = "";
         HttpSession session = request.getSession();
         if (session.getAttribute(ContextUtil.SESSION_KEY) != null) {
+            // 如果用户已经登录，优先从threadLocal中获取用户信息
             token = session.getAttribute(ContextUtil.SESSION_KEY).toString();
         } else {
+            // 此时客户可能是游客
             token = request.getHeader("X-Auth-Token");
         }
         TokenInfo tokenInfo = authService.getTokenInfo(token);
@@ -54,7 +57,7 @@ public class SecurityInterceptor implements HandlerInterceptor {
             if (userInfo == null) {
                 userInfo = new UserInfo();
                 userInfo.setUserId(token);
-                userInfo.setUserName("NOT_EXIST_USER");
+                userInfo.setUserName("visitor");
                 userInfo.setDetail("a temporary visitor");
                 userInfo.setSystemRole(SystemRole.VISITOR);
             }
